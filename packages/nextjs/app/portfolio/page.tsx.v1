@@ -1,0 +1,286 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import type { NextPage } from "next";
+import { Address, getAddress } from "viem";
+import { useAccount } from "wagmi";
+import question from "~~/app/assets/images/question.png";
+import rightBtn from "~~/app/assets/images/right-btn.png";
+import { MyProjectCard } from "~~/components/MyProjectCard";
+import { BlockieAvatar } from "~~/components/scaffold-eth";
+import { getInvestTxList, getUserInfo, getclaimTxList, getstakeTxList, getunstakeTxList, userActivityList } from "~~/services/api/api";
+import { cardTimeFormate, moneyFormate, shortAddress } from "~~/utils";
+import explorerIcon from "~~/app/assets/images/explorerIcon.png";
+import { getBlockExplorerAddressLink, getBlockExplorerTxLink } from "~~/utils/scaffold-eth";
+import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
+
+// export const metadata = getMetadata({
+//   title: "Project",
+//   // description: "Debug your deployed 🏗 WLSX Labs contracts in an easy way",
+// });
+
+const Portfolio: NextPage = () => {
+  const { targetNetwork } = useTargetNetwork();
+
+  const [userInfo, setUserInfo] = useState<any>({});
+  const [activeTabs, setActiveTabs] = useState("All");
+  const [tableList, setTableList] = useState<any>([]);
+  // { name: "All" },
+  const filterTabs = [{ name: "All" }, { name: "Invest" }, { name: "Stake" }, { name: "Unstake" }, { name: "Claim" }];
+  const { address } = useAccount();
+  let checkSumAddress = "";
+  if (address) {
+    checkSumAddress = getAddress(address as Address);
+  }
+  const shrotAddress = checkSumAddress?.slice(0, 4) + "..." + checkSumAddress?.slice(-4);
+  const router = useRouter();
+  const goToDetail = (item: any) => {
+    router.push(`/projectDetail?id=${item.projectId}`);
+  };
+  const goExpolre = (e: any, item: any) => {
+    e.stopPropagation();
+    window.open(getBlockExplorerTxLink(targetNetwork.id, item.txid))
+  };
+  const goExpolreUser = () => {
+    window.open(getBlockExplorerAddressLink(targetNetwork, checkSumAddress))
+  };
+  const initialized = useRef(false);
+  const queryUserActivityList = async () => {
+
+    const param = {
+      page: 1,
+      pageSize: 100,
+    };
+    const res = await userActivityList(param);
+    setTableList(res);
+  }
+  const queryInvestList = async () => {
+    const param = {
+      page: 1,
+      pageSize: 100,
+    };
+    const res = await getInvestTxList(param);
+    setTableList(res);
+  };
+  const queryStakeList = async () => {
+    const param = {
+      page: 1,
+      pageSize: 100,
+    };
+    const res = await getstakeTxList(param);
+    setTableList(res);
+  };
+  const queryunstakeList = async () => {
+    const param = {
+      page: 1,
+      pageSize: 100,
+    };
+    const res = await getunstakeTxList(param);
+    setTableList(res);
+  };
+  const queryclaimList = async () => {
+    const param = {
+      page: 1,
+      pageSize: 100,
+    };
+    const res = await getclaimTxList(param);
+    setTableList(res);
+  };
+
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+      queryUserInfo();
+      // queryUserActivityList();
+    }
+  }, []);
+  useEffect(() => {
+    if (activeTabs === "All") queryUserActivityList();
+    if (activeTabs === "Invest") queryInvestList();
+    if (activeTabs === "Stake") queryStakeList();
+    if (activeTabs === "Unstake") queryunstakeList();
+    if (activeTabs === "Claim") queryclaimList();
+  }, [activeTabs]);
+  const goToProjects = () => {
+    router.push(`/project`);
+  };
+  const queryUserInfo = async () => {
+    const res = await getUserInfo();
+    const nftIds = res.nftIds;
+    const stakeList = res.stakes;
+    nftIds.forEach((item: any) => {
+      const i = stakeList.findIndex((n: any) => item.nftId == n.nftId);
+      if (i < 0) {
+        res.stakes.push({
+          projectInfo: item.projectInfo,
+          nftId: item.nftId,
+          // stakeableShares: 0,
+          // shares: 0,
+        });
+      }
+    });
+    setUserInfo(res);
+  };
+  const filterTabsClick = (item: { name: any }) => {
+    setActiveTabs(item.name);
+  };
+  // const { data, isError, isLoading } = useEnsAvatar()
+  return (
+    <div className="w-[100%] flex items-center flex-col justify-center">
+      <div className="flex items-center flex-col  pt-[108px] w-[1178px] ">
+        <div
+          className="w-[100%] rounded-[12px] pt-[33px] pb-[33px] pl-[41px] pr-[46px]"
+          style={{ backgroundColor: "rgba(213,199,255,.2)" }}
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex gap-[26px]">
+              <BlockieAvatar address={checkSumAddress} size={95} rounded={"rounded-[9px]"} />
+              <div>
+                <div className="text-[24px] font-GothamBold">{shrotAddress}</div>
+                <div
+                  className="text-[16px] font-Gotham text-[rgba(255,255,255,.5)] flex items-center cursor-pointer"
+                  onClick={e => goExpolreUser()}
+                >
+                  {shrotAddress}
+                  <div
+                    className="w-[16px] h-[16px] rounded-[6px] flex justify-center items-center ml-[5px]"
+                    style={{
+                      border: "1px solid rgba(255, 255, 255, 0.4)",
+                    }}
+                  >
+                    <Image src={explorerIcon} width={6} height={6} alt="" />
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="text-[20px] font-GothamBold flex items-center gap-[5px]">
+                Total Solar Power
+                <Image src={question} alt="" width={17} height={17} />
+              </div>
+              <div className="text-right mt-[15px]">
+                <span className="text-[50px] font-GothamBold">0.</span>
+                <span className="text-[30px] font-GothamBold">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {userInfo?.stakes?.length ? (
+        <>
+          <div className="flex items-center flex-col  pt-[83px] w-[1178px] ">
+            <div className="w-[100%]">
+              <div className="text-[32px] text-[#fff] font-extrabold leading-[61px]  font-PPNeueMachina text-left w-[100%] title-text-shadow">
+                My Investments({userInfo?.stakes?.length || 0})
+              </div>
+              <div className="flex gap-[28px] mt-[39px] flex-wrap">
+                {userInfo?.stakes?.map((item: any, key: any) => (
+                  <MyProjectCard
+                    status="active"
+                    key={key}
+                    item={item}
+                    checkSumAddress={checkSumAddress}
+                    queryUserInfo={queryUserInfo}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="w-[1178px] mt-[104px]">
+            <div className="flex items-end justify-between">
+              <div className="text-[32px] text-[#fff] font-extrabold leading-[61px] font-PPNeueMachina title-text-shadow">
+                Recent activity
+              </div>
+              <div className="flex gap-[22px]">
+                {filterTabs.map((item, key) => (
+                  <div
+                    key={key}
+                    onClick={() => filterTabsClick(item)}
+                    className={`w-[63px] h-[24px] rounded-[24px] text-[14px] font-GothamBold cursor-pointer  text-center flex items-center justify-center hover:text-[#fff] hover:bg-[rgba(213,199,255,.2)] ${activeTabs === item.name ? "text-[#fff] bg-[rgba(213,199,255,.2)]" : "text-[rgba(255,255,255,.5)]"
+                      }`}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-[26px]">
+              <div
+                className="w-[100%] rounded-[10px] py-[7px] font-GothamBold text-[14px] font-bold flex"
+                style={{ background: "linear-gradient(90deg, #9A5CFF 0%, #215FFF 100%)" }}
+              >
+                <div className="w-[263px] pl-[29px]">Activity</div>
+                <div className="w-[314px]">Date(UTC)</div>
+                <div className="w-[229px]">Amount</div>
+                <div className="w-[210px]">Value</div>
+                <div className="w-[162px] text-right pr-[51px]">Hash</div>
+              </div>
+              {tableList.map((item: any, key: number) => (
+                <div
+                  key={key}
+                  className="pt-[29px] pb-[34px] text-[14px] font-Gotham flex mt-[9px] rounded-[12px]"
+                  style={{
+                    backgroundColor: key % 2 == 1 ? "rgba(213, 199, 255, .1)" : "rgba(213, 199, 255, .2)",
+                  }}
+                // onClick={() => goToDetail(item)}
+                >
+                  <div className="w-[263px] pl-[29px]">{activeTabs !== "All" ? activeTabs : item.activity}</div>
+                  <div className="w-[314px]">{cardTimeFormate(item.blockTime)}</div>
+                  <div className="w-[229px]">{moneyFormate(item.amount)}</div>
+                  <div className="w-[210px]">{item.shares}</div>
+                  <div
+                    className="w-[162px] text-right pr-[51px] flex  items-center cursor-pointer justify-end"
+                    onClick={e => goExpolre(e, item)}
+                  >
+                    {shortAddress(item.txid)}
+                    <div
+                      className="w-[16px] h-[16px] rounded-[6px] flex justify-center items-center ml-[5px]"
+                      style={{
+                        border: "1px solid rgba(255, 255, 255, 0.4)",
+                      }}
+                    >
+                      <Image src={explorerIcon} width={6} height={6} alt="" />
+
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="flex items-center flex-col  pt-[200px] pb-[200px] w-[1178px]">
+          <div className="text-[28px] font-GothamBold">You don’t have any allocations yet.</div>
+          <div className="text-[20px] font-Gotham text-[rgba(255,255,255,.5)]">
+            Allocation for all the sales that you are participating in will show up here.
+          </div>
+          <div
+            className="content w-[200px] h-[50px] rounded-[50px] flex items-center justify-center cursor-pointer mt-[54px]"
+            style={{
+              boxSizing: "border-box",
+              padding: "2px",
+              backgroundImage: "linear-gradient(90deg, #9A5CFF 0%, #215FFF 100%)",
+            }}
+          >
+            <div
+              className="flex gap-[11px] bg-[#0e0d1f] font-GothamBold w-[296px] h-[46px] rounded-[46px] justify-center items-center cursor-pointer hover:bg-[#262535]"
+              style={{
+                boxShadow: "0px 0px 10px 0px rgba(121, 143, 255, 0.9)",
+              }}
+              onClick={goToProjects}
+            >
+              Go to Projects
+              <Image src={rightBtn} alt="" width={6} height={10} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Portfolio;

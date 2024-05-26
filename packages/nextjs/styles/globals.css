@@ -1,0 +1,150 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "react-toastify/dist/ReactToastify.css";
+@import "../components/custom-components.css";
+
+@layer base {
+  @font-face {
+    font-family: "PPNeueMachina";
+    src: url("../fonts/PPNeueMachina.otf");
+  }
+  @font-face {
+    font-family: "GothamBold";
+    src: url("../fonts/GothamBold.otf");
+  }
+  @font-face {
+    font-family: "GothamRounded";
+    src: url("../fonts/GothamRounded.otf");
+  }
+  @font-face {
+    font-family: "Gotham";
+    src: url("../fonts/Gotham.otf");
+  }
+  @font-face {
+    font-family: "GothamNewMedium";
+    src: url("../fonts/GothamRndMedium.otf");
+  }
+}
+:root,
+[data-theme] {
+  background: oklch(var(--background));
+}
+body {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+p {
+  margin: 1rem 0;
+}
+
+.btn {
+  @apply shadow-md;
+}
+
+.btn.btn-ghost {
+  @apply shadow-none;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+rotate@-webkit-keyframes stepLoading {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@-moz-keyframes stepLoading {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+
+  to {
+    -moz-transform: rotate(359deg);
+  }
+}
+
+@-o-keyframes stepLoading {
+  from {
+    -o-transform: rotate(0deg);
+  }
+
+  to {
+    -o-transform: rotate(359deg);
+  }
+}
+
+@keyframes stepLoading {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}
+.loading {
+  -webkit-transition-property: -webkit-transform;
+
+  -webkit-transition-duration: 1s;
+
+  -moz-transition-property: -moz-transform;
+
+  -moz-transition-duration: 1s;
+
+  -webkit-animation: stepLoading 3s linear infinite;
+
+  -moz-animation: stepLoading 3s linear infinite;
+
+  -o-animation: stepLoading 3s linear infinite;
+
+  animation: stepLoading 3s linear infinite;
+}
+.title-text-shadow {
+  text-shadow: 0px 0px 6px rgba(255, 255, 255, 0.4);
+}
+.text-ellipsis-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+.animalImg {
+  animation: Updown 3s infinite alternate;
+}
+
+@keyframes Updown {
+  from {
+    margin-top: -3px;
+  }
+
+  to {
+    margin-top: 5px;
+  }
+}
+.MuiDialog-paper {
+  background-color: transparent !important;
+}
+.base-Popper-root {
+  /* background: rgba(213, 199, 255, 0.1);
+  font-size: 14px;
+  font-family: "Gotham"; */
+}

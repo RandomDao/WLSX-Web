@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer utilities {
+  .projectBlockCard {
+    transition: all 0.15s ease-in;
+  }
+  .projectBlockCard:hover {
+    transform: translateY(-4px);
+  }
+  .MuiSelect-select {
+    svg {
+      color: #fff;
+    }
+  }
+  .Mui-focused {
+    fieldset {
+      border-color: red;
+    }
+  }
+}

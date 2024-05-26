@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer utilities {
+  .projectBlockCard {
+    transition: all 0.1s ease-in;
+  }
+  .projectBlockCard:hover {
+    transform: translateY(-6px);
+  }
+  .projectCard {
+    /* background: linear-gradient(219.85deg, rgba(156, 129, 233, 0.54) -0.17%, rgba(198, 163, 255, 0.1) 100%); */
+
+    /* background: linear-gradient(219.85deg, rgba(156, 129, 233, 0.54) -0.17%, rgba(198, 163, 255, 0.1) 100%); */
+    /* background:url('../public/projectCardBg.png'); */
+    /* background: #2d2747; */
+    background: linear-gradient(219.85deg, rgba(156, 129, 233, 0.54) -0.17%, rgba(198, 163, 255, 0.1) 100%);
+  }
+ 
+}
